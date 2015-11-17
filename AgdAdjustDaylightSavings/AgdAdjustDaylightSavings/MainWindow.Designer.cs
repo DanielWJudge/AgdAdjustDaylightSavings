@@ -39,6 +39,7 @@
             this.labelTotalFilesLoaded = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.label2 = new System.Windows.Forms.Label();
+            this.buttonAdjustFiles = new System.Windows.Forms.Button();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -85,7 +86,7 @@
             this.flowLayoutPanel1.Controls.Add(this.comboBoxTimeZone);
             this.flowLayoutPanel1.Controls.Add(this.labelDayLightStart);
             this.flowLayoutPanel1.Controls.Add(this.labelDayLightEnd);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(15, 406);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(15, 346);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(949, 38);
             this.flowLayoutPanel1.TabIndex = 4;
@@ -144,7 +145,7 @@
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(949, 343);
+            this.dataGridView1.Size = new System.Drawing.Size(949, 282);
             this.dataGridView1.TabIndex = 7;
             // 
             // label2
@@ -157,11 +158,26 @@
             this.label2.Text = "Status:";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // buttonAdjustFiles
+            // 
+            this.buttonAdjustFiles.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.buttonAdjustFiles.AutoSize = true;
+            this.buttonAdjustFiles.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAdjustFiles.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.buttonAdjustFiles.Location = new System.Drawing.Point(422, 408);
+            this.buttonAdjustFiles.Margin = new System.Windows.Forms.Padding(5);
+            this.buttonAdjustFiles.Name = "buttonAdjustFiles";
+            this.buttonAdjustFiles.Size = new System.Drawing.Size(134, 35);
+            this.buttonAdjustFiles.TabIndex = 9;
+            this.buttonAdjustFiles.Text = "Adjust Files!";
+            this.buttonAdjustFiles.UseVisualStyleBackColor = true;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(976, 707);
+            this.Controls.Add(this.buttonAdjustFiles);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.labelTotalFilesLoaded);
@@ -192,6 +208,7 @@
         private System.Windows.Forms.Label labelTotalFilesLoaded;
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button buttonAdjustFiles;
     }
 }
 

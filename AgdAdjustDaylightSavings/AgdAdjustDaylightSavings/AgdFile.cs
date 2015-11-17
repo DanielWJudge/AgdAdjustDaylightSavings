@@ -43,6 +43,11 @@ namespace AgdAdjustDaylightSavings
             }
         }
 
+        public override string ToString()
+        {
+            return FileName;
+        }
+
         protected bool Equals(AgdFile other)
         {
             return string.Equals(FileName, other.FileName);

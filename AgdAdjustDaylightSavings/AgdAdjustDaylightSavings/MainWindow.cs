@@ -16,6 +16,13 @@ namespace AgdAdjustDaylightSavings
             InitializeComponent();
 
             buttonAddFiles.Click += (sender, args) => ButtonAddFilesClicked();
+            buttonAdjustFiles.Click += (sender, args) => AdjustFiles();
+            richTextBox1.TextChanged += (sender, args) =>
+            {
+                richTextBox1.SelectionStart = richTextBox1.Text.Length; //Set the current caret position at the end
+                richTextBox1.ScrollToCaret(); //Now scroll it automatically
+            };
+
 
             this.HandleCreated += (sender, args) =>
             {
@@ -45,6 +52,21 @@ namespace AgdAdjustDaylightSavings
                     labelDayLightEnd.Text = string.Format("Daylight End: unknown");
                 }
             };
+        }
+
+        private void AdjustFiles()
+        {
+            if (_loadedFiles == null || !_loadedFiles.Any())
+            {
+                MessageBox.Show(this, "Please Load Some Files Before Adjusting", "Load Files First",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            foreach (var file in _loadedFiles)
+            {
+                richTextBox1.AppendText("adjusting file: " + file + "\r\n");
+            }
         }
 
         private void ButtonAddFilesClicked()
@@ -80,9 +102,9 @@ namespace AgdAdjustDaylightSavings
 
             if (filesToAdd.Any())
             {
+                richTextBox1.AppendText("adding " + filesToAdd.Count() + " files\r\n");
                 _loadedFiles.AddRange(filesToAdd.Select(file => new AgdFile(file)));
                 _source.ResetBindings(false);
-
                 labelTotalFilesLoaded.Text = string.Format("{0} Files Loaded", _loadedFiles.Count);
             }
         }
