@@ -13,8 +13,7 @@ namespace AgdAdjustDaylightSavings
         {
             FileName = fileName;
 
-            string connectionString = GetSQLiteConnectionString(FileName);
-            using (var db = new OrmLiteConnectionFactory(connectionString, SqliteDialect.Provider).OpenDbConnection())
+            using (var db = new OrmLiteConnectionFactory(GetSQLiteConnectionString(), SqliteDialect.Provider).OpenDbConnection())
             {
                 using (var cmd = db.CreateCommand())
                 {
@@ -25,7 +24,6 @@ namespace AgdAdjustDaylightSavings
                         {
                             long firstEpoch = (long)rdr[0];
                             FirstEpoch = new DateTime(firstEpoch);
-
                         }
                     }
                     
@@ -36,7 +34,6 @@ namespace AgdAdjustDaylightSavings
                         {
                             long lastEpoch = (long)rdr[0];
                             LastEpoch = new DateTime(lastEpoch);
-
                         }
                     }
                 }
@@ -66,21 +63,21 @@ namespace AgdAdjustDaylightSavings
             return (FileName != null ? FileName.GetHashCode() : 0);
         }
 
-        private string GetSQLiteConnectionString(string filename)
+        public string GetSQLiteConnectionString()
         {
             const string FAIL = "FailIfMissing=True;";
 
             //we have to add 4 leading backslashes for UNC paths
             try
             {
-                var uri = new Uri(filename);
+                var uri = new Uri(FileName);
                 if (uri.IsUnc)
-                    return @"Data Source=" + "\"\\\\" + filename + "\"" + "; Synchronous=Off; Cache Size=1048576; " + FAIL + " Legacy Format=False; auto_vacuum=1";
+                    return @"Data Source=" + "\"\\\\" + FileName + "\"" + "; Synchronous=Off; Cache Size=1048576; " + FAIL + " Legacy Format=False; auto_vacuum=1";
             }
             catch { /* unable to get URI from it, so assume it's not a UNC */ }
 
 
-            return @"Data Source=" + "\"" + filename + "\"" + "; Synchronous=Off; Cache Size=1048576; " + FAIL + " Legacy Format=False; auto_vacuum=1";
+            return @"Data Source=" + "\"" + FileName + "\"" + "; Synchronous=Off; Cache Size=1048576; " + FAIL + " Legacy Format=False; auto_vacuum=1";
         }
     }
 }
