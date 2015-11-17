@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using ServiceStack.DataAnnotations;
+using ServiceStack.OrmLite;
 
 namespace AgdAdjustDaylightSavings
 {
@@ -22,9 +24,8 @@ namespace AgdAdjustDaylightSavings
                 richTextBox1.SelectionStart = richTextBox1.Text.Length; //Set the current caret position at the end
                 richTextBox1.ScrollToCaret(); //Now scroll it automatically
             };
-
-
-            this.HandleCreated += (sender, args) =>
+            
+            HandleCreated += (sender, args) =>
             {
                 foreach (TimeZoneInfo z in TimeZoneInfo.GetSystemTimeZones())
                     comboBoxTimeZone.Items.Add(z);
@@ -62,10 +63,124 @@ namespace AgdAdjustDaylightSavings
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            
+            var timeZoneInfo = comboBoxTimeZone.SelectedItem as TimeZoneInfo;
+            if (timeZoneInfo == null)
+                return;
 
+            buttonAddFiles.Enabled = false;
+            buttonAdjustFiles.Enabled = false;
+
+            var daylightTime = TimeZoneHelpers.GetDaylightChanges(timeZoneInfo.Id, 2015);
             foreach (var file in _loadedFiles)
             {
                 richTextBox1.AppendText("adjusting file: " + file + "\r\n");
+                AdjustFile(file, daylightTime);
+            }
+
+            richTextBox1.AppendText("ALL DONE!\r\n");
+
+            buttonAddFiles.Enabled = true;
+            buttonAdjustFiles.Enabled = true;
+        }
+
+        private void AdjustFile(AgdFile file, DaylightTime daylightTime)
+        {
+            if (file == null)
+                throw new NullReferenceException("file can't be null");
+
+            if (daylightTime == null)
+                throw new ArgumentNullException("");
+            using (var db = new OrmLiteConnectionFactory(file.GetSQLiteConnectionString(), SqliteDialect.Provider).OpenDbConnection())
+            {
+                string sql;
+
+                //see if there's any epochs before DST
+                int epochsBeforeDST =
+                    db.Scalar<int>(
+                        db.From<AgdTableTimestampAxis1>()
+                            .Select(Sql.Count("*"))
+                            .Where(q => q.TimestampTicks < daylightTime.End.Ticks));
+                bool dataBeforeDST = epochsBeforeDST > 0;
+
+                int epochsAfterDST =
+                    db.Scalar<int>(
+                        db.From<AgdTableTimestampAxis1>()
+                            .Select(Sql.Count("*"))
+                            .Where(q => q.TimestampTicks > daylightTime.End.Ticks));
+                bool dataAfterDST = epochsAfterDST > 0;
+
+                
+                if (dataBeforeDST && !dataAfterDST)
+                {
+                    //there's only data before
+                    //no need to do anything
+                    richTextBox1.AppendText(file + " only has data BEFORE daylight savings time ended\r\n");
+                    return;
+                }
+
+                //delete the extra hour of data (October 25th 0200) 
+                sql = string.Format("DELETE FROM data WHERE dataTimestamp >= {0} AND dataTimeStamp < {1}",
+                    daylightTime.End.Ticks, daylightTime.End.Add(daylightTime.Delta).Ticks);
+                db.ExecuteSql(sql);
+                
+                //adjust timestamps for data after DST by subtracting an hour
+                sql =
+                    string.Format(
+                        "UPDATE data SET dataTimestamp = dataTimestamp - {0} WHERE dataTimestamp >= {1}",
+                        daylightTime.Delta.Ticks, daylightTime.End.Ticks);
+                db.ExecuteSql(sql);
+
+                //adjust WTV
+                if (db.TableExists("filters"))
+                {
+                    sql =
+                        string.Format(
+                            "UPDATE filters SET filterStartTimestamp = filterStartTimestamp - {0} WHERE filterStartTimestamp >= {1}",
+                            daylightTime.Delta.Ticks, daylightTime.End.Ticks);
+                    db.ExecuteSql(sql);
+
+                    sql =
+                        string.Format(
+                            "UPDATE filters SET filterStopTimestamp = filterStopTimestamp - {0} WHERE filterStopTimestamp >= {1}",
+                            daylightTime.Delta.Ticks, daylightTime.End.Ticks);
+                    db.ExecuteSql(sql);
+                }
+
+                if (db.TableExists("wtvBouts"))
+                {
+                    sql =
+                        string.Format(
+                            "UPDATE wtvBouts SET startTicks = startTicks - {0} WHERE startTicks >= {1}",
+                            daylightTime.Delta.Ticks, daylightTime.End.Ticks);
+                    db.ExecuteSql(sql);
+
+                    sql =
+                        string.Format(
+                            "UPDATE wtvBouts SET stopTicks  = stopTicks - {0} WHERE stopTicks >= {1}",
+                            daylightTime.Delta.Ticks, daylightTime.End.Ticks);
+                    db.ExecuteSql(sql);
+                }
+
+                //adjust capsense
+                if (db.TableExists("capsense"))
+                {
+                    //delete the extra hour of data (October 25th 0200) 
+                    sql = string.Format("DELETE FROM capsense WHERE timeStamp  >= {0} AND timeStamp < {1}",
+                        daylightTime.End.Ticks, daylightTime.End.Add(daylightTime.Delta).Ticks);
+                    db.ExecuteSql(sql);
+
+                    //adjust timestamps for data after DST by subtracting an hour
+                    sql =
+                        string.Format(
+                            "UPDATE capsense SET timeStamp = timeStamp - {0} WHERE timeStamp >= {1}",
+                            daylightTime.Delta.Ticks, daylightTime.End.Ticks);
+                    db.ExecuteSql(sql);
+                }
+
+                //adjust sleep??
+
+                richTextBox1.AppendText("finished adjusting file: " + file + "\r\n");
             }
         }
 
