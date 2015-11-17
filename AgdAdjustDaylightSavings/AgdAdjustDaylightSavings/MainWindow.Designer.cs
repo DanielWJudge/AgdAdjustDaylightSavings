@@ -38,6 +38,7 @@
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.labelTotalFilesLoaded = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.label2 = new System.Windows.Forms.Label();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
@@ -84,7 +85,7 @@
             this.flowLayoutPanel1.Controls.Add(this.comboBoxTimeZone);
             this.flowLayoutPanel1.Controls.Add(this.labelDayLightStart);
             this.flowLayoutPanel1.Controls.Add(this.labelDayLightEnd);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(15, 57);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(15, 406);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(949, 38);
             this.flowLayoutPanel1.TabIndex = 4;
@@ -111,12 +112,13 @@
             // 
             // richTextBox1
             // 
-            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBox1.Location = new System.Drawing.Point(15, 497);
+            this.richTextBox1.Location = new System.Drawing.Point(15, 479);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.ReadOnly = true;
-            this.richTextBox1.Size = new System.Drawing.Size(949, 186);
+            this.richTextBox1.Size = new System.Drawing.Size(949, 216);
             this.richTextBox1.TabIndex = 5;
             this.richTextBox1.Text = "";
             // 
@@ -137,7 +139,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(15, 111);
+            this.dataGridView1.Location = new System.Drawing.Point(15, 57);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
             this.dataGridView1.RowHeadersVisible = false;
@@ -145,11 +147,22 @@
             this.dataGridView1.Size = new System.Drawing.Size(949, 343);
             this.dataGridView1.TabIndex = 7;
             // 
-            // Form1
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(18, 459);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(46, 17);
+            this.label2.TabIndex = 8;
+            this.label2.Text = "Status:";
+            this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(976, 731);
+            this.ClientSize = new System.Drawing.Size(976, 707);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.dataGridView1);
             this.Controls.Add(this.labelTotalFilesLoaded);
             this.Controls.Add(this.richTextBox1);
@@ -157,7 +170,7 @@
             this.Controls.Add(this.buttonAddFiles);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
-            this.Name = "Form1";
+            this.Name = "MainWindow";
             this.Text = "Adjust AGD Timestamps For Daylight Savings";
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
@@ -178,6 +191,7 @@
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Label labelTotalFilesLoaded;
         private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Label label2;
     }
 }
 
