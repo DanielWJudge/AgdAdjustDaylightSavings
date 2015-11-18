@@ -13,6 +13,11 @@ namespace AgdAdjustDaylightSavings
         {
             FileName = fileName;
 
+            GetFirstAndLastEpoch();
+        }
+
+        public void GetFirstAndLastEpoch()
+        {
             using (var db = new OrmLiteConnectionFactory(GetSQLiteConnectionString(), SqliteDialect.Provider).OpenDbConnection())
             {
                 using (var cmd = db.CreateCommand())
@@ -22,17 +27,17 @@ namespace AgdAdjustDaylightSavings
                     {
                         while (rdr.Read())
                         {
-                            long firstEpoch = (long)rdr[0];
+                            long firstEpoch = (long) rdr[0];
                             FirstEpoch = new DateTime(firstEpoch);
                         }
                     }
-                    
+
                     cmd.CommandText = "SELECT dataTimestamp FROM data ORDER BY dataTimestamp DESC limit 1";
                     using (var rdr = cmd.ExecuteReader())
                     {
                         while (rdr.Read())
                         {
-                            long lastEpoch = (long)rdr[0];
+                            long lastEpoch = (long) rdr[0];
                             LastEpoch = new DateTime(lastEpoch);
                         }
                     }

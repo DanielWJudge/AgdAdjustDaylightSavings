@@ -44,8 +44,8 @@ namespace AgdAdjustDaylightSavings
                 var daylightTime = TimeZoneHelpers.GetDaylightChanges(timeZoneInfo.Id, 2015);
                 if (daylightTime != null)
                 {
-                    labelDayLightStart.Text = string.Format("Daylight Start: {0:g}", daylightTime.Start);
-                    labelDayLightEnd.Text = string.Format("Daylight End: {0:g}", daylightTime.End);
+                    labelDayLightStart.Text = string.Format("Daylight Start: {0:G}", daylightTime.Start);
+                    labelDayLightEnd.Text = string.Format("Daylight End: {0:G}", daylightTime.End);
                 }
                 else
                 {
@@ -73,10 +73,7 @@ namespace AgdAdjustDaylightSavings
 
             var daylightTime = TimeZoneHelpers.GetDaylightChanges(timeZoneInfo.Id, 2015);
             foreach (var file in _loadedFiles)
-            {
-                richTextBox1.AppendText("adjusting file: " + file + "\r\n");
                 AdjustFile(file, daylightTime);
-            }
 
             richTextBox1.AppendText("ALL DONE!\r\n");
 
@@ -91,10 +88,11 @@ namespace AgdAdjustDaylightSavings
 
             if (daylightTime == null)
                 throw new ArgumentNullException("");
+
+            richTextBox1.AppendText(string.Format("{0}: started adjusting\r\n", file));
+
             using (var db = new OrmLiteConnectionFactory(file.GetSQLiteConnectionString(), SqliteDialect.Provider).OpenDbConnection())
             {
-                string sql;
-
                 //see if there's any epochs before DST
                 int epochsBeforeDST =
                     db.Scalar<int>(
@@ -115,12 +113,12 @@ namespace AgdAdjustDaylightSavings
                 {
                     //there's only data before
                     //no need to do anything
-                    richTextBox1.AppendText(file + " only has data BEFORE daylight savings time ended\r\n");
+                    richTextBox1.AppendText(string.Format("{0}: only has data BEFORE daylight savings time ended\r\n", file));
                     return;
                 }
 
                 //delete the extra hour of data (October 25th 0200) 
-                sql = string.Format("DELETE FROM data WHERE dataTimestamp >= {0} AND dataTimeStamp < {1}",
+                string sql = string.Format("DELETE FROM data WHERE dataTimestamp >= {0} AND dataTimeStamp < {1}",
                     daylightTime.End.Ticks, daylightTime.End.Add(daylightTime.Delta).Ticks);
                 db.ExecuteSql(sql);
                 
@@ -157,7 +155,7 @@ namespace AgdAdjustDaylightSavings
 
                     sql =
                         string.Format(
-                            "UPDATE wtvBouts SET stopTicks  = stopTicks - {0} WHERE stopTicks >= {1}",
+                            "UPDATE wtvBouts SET stopTicks = stopTicks - {0} WHERE stopTicks >= {1}",
                             daylightTime.Delta.Ticks, daylightTime.End.Ticks);
                     db.ExecuteSql(sql);
                 }
@@ -180,7 +178,13 @@ namespace AgdAdjustDaylightSavings
 
                 //adjust sleep??
 
-                richTextBox1.AppendText("finished adjusting file: " + file + "\r\n");
+
+                var oldFirstEpoch = file.FirstEpoch;
+                var oldLastEpoch = file.LastEpoch;
+                file.GetFirstAndLastEpoch();
+                richTextBox1.AppendText(string.Format("{0}: original first epoch - {1:G} | new first epoch - {2:G}\r\n", file, oldFirstEpoch, file.FirstEpoch));
+                richTextBox1.AppendText(string.Format("{0}: original last epoch - {1:G} | new last epoch - {2:G}\r\n", file, oldLastEpoch, file.LastEpoch));
+                richTextBox1.AppendText(string.Format("{0}: finished adjusting file\r\n", file));
             }
         }
 
