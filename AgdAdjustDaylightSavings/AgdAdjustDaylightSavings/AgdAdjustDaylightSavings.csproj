@@ -71,6 +71,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AgdFile.cs" />
+    <Compile Include="AgdSettings.cs" />
+    <Compile Include="AgdTableTimestampAxis1.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>

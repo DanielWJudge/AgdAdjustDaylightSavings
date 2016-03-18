@@ -8,6 +8,8 @@ namespace AgdAdjustDaylightSavings
         public string FileName { get; set; }
         public DateTime FirstEpoch { get; set; }
         public DateTime LastEpoch { get; set; }
+        public long EpochCount { get; private set; }
+        public int EpochLengthInSeconds { get; private set; }
 
         public AgdFile(string fileName)
         {
@@ -32,6 +34,16 @@ namespace AgdAdjustDaylightSavings
                         }
                     }
 
+                    cmd.CommandText = string.Format("SELECT dataTimestamp FROM data WHERE dataTimeStamp > {0} ORDER BY dataTimestamp limit 1", FirstEpoch.Ticks);
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            var secondEpoch = new DateTime((long)rdr[0]);
+                            EpochLengthInSeconds = (int) secondEpoch.Subtract(FirstEpoch).TotalSeconds;
+                        }
+                    }
+
                     cmd.CommandText = "SELECT dataTimestamp FROM data ORDER BY dataTimestamp DESC limit 1";
                     using (var rdr = cmd.ExecuteReader())
                     {
@@ -41,9 +53,12 @@ namespace AgdAdjustDaylightSavings
                             LastEpoch = new DateTime(lastEpoch);
                         }
                     }
+
+                    EpochCount = db.Scalar<long>(db.From<AgdTableTimestampAxis1>().Select(Sql.Count("*")));
                 }
             }
         }
+
 
         public override string ToString()
         {
